@@ -51,7 +51,10 @@ export default class Month extends Vue {
       }) || [];
     this.month = [
       ...new Array(this.month[0].date.getDay() - 1).fill(null),
-      ...this.month
+      ...this.month,
+      ...new Array(8 - this.month[this.month.length - 1].date.getDay()).fill(
+        null
+      )
     ];
     this.dateFormatted = format(this.date, "MM.yyyy");
   }
@@ -59,9 +62,21 @@ export default class Month extends Vue {
 </script>
 
 <style scoped lang="scss">
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .grid {
+  margin-top: 20px;
 }
 .row {
   display: flex;
+  width: 100%;
+  border-top: #2c3e50 solid 1px;
+  border-left: #2c3e50 solid 1px;
+  &:last-of-type {
+    border-bottom: #2c3e50 solid 1px;
+  }
 }
 </style>
