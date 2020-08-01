@@ -1,17 +1,31 @@
 <template>
-  <div>
+  <div class="day">
     <h1>Day</h1>
     <p>{{ dateFormatted }}</p>
-    <p>{{ dayState }}</p>
+    <div
+      v-for="event in getSortedEvents(dayState.events)"
+      v-bind:key="event.name"
+      class="event"
+    >
+      <EventBlock v-bind:event="event" />
+    </div>
+    <div v-if="!dayState.events.length">
+      No events yet!
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import EventBlock from "@/components/EventBlock.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { DayState } from "@/models/calendar.model";
+import { DayState, Event } from "@/models/calendar.model";
 import { format } from "date-fns";
 
-@Component
+@Component({
+  components: {
+    EventBlock
+  }
+})
 export default class Day extends Vue {
   @Prop() private date!: Date;
   private dateFormatted = "";
@@ -33,7 +47,21 @@ export default class Day extends Vue {
     };
     this.dateFormatted = format(this.date, "dd.MM.yyyy");
   }
+  getSortedEvents(events: Event[]): Event[] {
+    return events.sort((a, b) =>
+      a.date.getTime() > b.date.getTime() ? 1 : -1
+    );
+  }
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  > .event {
+    width: fit-content;
+  }
+}
+</style>

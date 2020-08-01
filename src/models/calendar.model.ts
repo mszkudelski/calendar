@@ -1,6 +1,8 @@
 export interface Event {
   date: Date;
   name: string;
+  // minutes
+  duration: number;
 }
 
 export interface DayState {

@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { CookiesService } from "@/helpers/cookie.service";
 import { Calendar, DayState } from "@/models/calendar.model";
-import { format } from "date-fns";
+import { add, format } from "date-fns";
 
 Vue.use(Vuex);
 
@@ -33,7 +33,14 @@ export default new Vuex.Store({
       value: JSON.stringify([
         {
           date: new Date(),
-          events: [{ date: new Date(), name: "Meeting with Thomas" }]
+          events: [
+            {
+              date: add(new Date(), { hours: 2 }),
+              name: "Dinner with Kate",
+              duration: 45
+            },
+            { date: new Date(), name: "Meeting with Thomas", duration: 90 }
+          ]
         }
       ])
     });
