@@ -1,9 +1,9 @@
 <template>
-  <main>
+  <div>
     <h1>Day</h1>
     <p>{{ date }}</p>
     <p>{{ dayState }}</p>
-  </main>
+  </div>
 </template>
 
 <script lang="ts">

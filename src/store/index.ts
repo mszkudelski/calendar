@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { CookiesService } from "@/helpers/cookie.service";
-import { DayState } from "@/models/calendar.model";
+import { Calendar, DayState } from "@/models/calendar.model";
 import { format } from "date-fns";
 
 Vue.use(Vuex);
@@ -10,7 +10,7 @@ const cookieService = new CookiesService();
 const cookieName = "calendar-app-state";
 
 export default new Vuex.Store({
-  state: () => {
+  state: (): Calendar => {
     const data: DayState[] = JSON.parse(cookieService.get(cookieName));
     if (data) {
       return data.reduce((result, day) => {
