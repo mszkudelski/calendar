@@ -1,17 +1,67 @@
 <template>
   <main>
     <h1>Month</h1>
-    <p>{{ date }}</p>
+    <p>{{ dateFormatted }}</p>
+    <div class="grid">
+      <div class="row" v-for="week in getWeeksInMonth(date)" v-bind:key="week">
+        <div
+          v-for="(day, index) in month.slice((week - 1) * 7, week * 7)"
+          v-bind:key="index"
+        >
+          <DayBlock v-bind:day="day" />
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { format, getDaysInMonth, setDate, getWeeksInMonth } from "date-fns";
+import { DayState } from "@/models/calendar.model";
+import DayBlock from "@/components/DayBlock.vue";
 
-@Component
+@Component({
+  components: {
+    DayBlock
+  }
+})
 export default class Month extends Vue {
   @Prop() private date!: Date;
+  month: DayState[] = [];
+  dateFormatted = "";
+  getWeeksInMonth = getWeeksInMonth;
+  constructor() {
+    super();
+    this.$watch("date", this.updateMonth);
+  }
+  mounted() {
+    this.updateMonth();
+  }
+  updateMonth() {
+    const monthMap: Map<string, DayState> = this.$store.getters.getMonth(
+      this.date
+    );
+    this.month =
+      new Array(getDaysInMonth(this.date)).fill(null).map((_, index) => {
+        const date = setDate(this.date, index + 1);
+        const key = format(date, "yyyy-MM-dd");
+        const day = monthMap.get(key);
+        return day || { date, events: [] };
+      }) || [];
+    this.month = [
+      ...new Array(this.month[0].date.getDay() - 1).fill(null),
+      ...this.month
+    ];
+    this.dateFormatted = format(this.date, "MM.yyyy");
+  }
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.grid {
+}
+.row {
+  display: flex;
+}
+</style>

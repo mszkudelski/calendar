@@ -1,5 +1,5 @@
 <template>
-  <Month v-bind:date="new Date()" />
+  <Month v-bind:date="date" />
 </template>
 
 <script>
@@ -10,6 +10,11 @@ export default {
   name: "MonthView",
   components: {
     Month
+  },
+  data() {
+    return {
+      date: new Date()
+    };
   }
 };
 </script>

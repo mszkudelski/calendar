@@ -66,6 +66,16 @@ export default new Vuex.Store({
   modules: {},
   getters: {
     getDay: state => (date: Date) =>
-      state.get(format(new Date(date), "yyyy-MM-dd"))
+      state.get(format(new Date(date), "yyyy-MM-dd")),
+    getMonth: state => (date: Date) => {
+      const dayKey = format(new Date(date), "yyyy-MM-");
+      return new Map(
+        Array.from(state.entries())
+          .map(([key, day]: [string, DayState]) =>
+            key.includes(dayKey) ? [key, day] : null
+          )
+          .filter(item => item !== null) as [string, DayState][]
+      );
+    }
   }
 });
