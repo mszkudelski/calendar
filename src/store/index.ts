@@ -8,6 +8,15 @@ Vue.use(Vuex);
 
 const cookieService = new CookiesService();
 const cookieName = "calendar-app-state";
+const cookieExpirationTime = 365 * 24 * 3600;
+
+function saveCalendarInCookie(calendar: Calendar) {
+  cookieService.set({
+    name: cookieName,
+    expiration: cookieExpirationTime,
+    value: JSON.stringify(Array.from(calendar.values()))
+  });
+}
 
 export default new Vuex.Store({
   state: (): Calendar => {
@@ -26,10 +35,10 @@ export default new Vuex.Store({
       }, new Map<string, DayState>());
     }
 
-    // First user's app usage - cookie doesnt' exist yet
+    // First user's app usage - cookie doesn't exist yet
     cookieService.set({
       name: cookieName,
-      expiration: 365 * 24 * 3600,
+      expiration: cookieExpirationTime,
       value: JSON.stringify([
         {
           date: new Date(),
@@ -46,7 +55,13 @@ export default new Vuex.Store({
     });
     return new Map();
   },
-  mutations: {},
+  mutations: {
+    changeDay(state, day: DayState) {
+      state.set(format(day.date, "yyyy-MM-dd"), day);
+
+      saveCalendarInCookie(state);
+    }
+  },
   actions: {},
   modules: {},
   getters: {

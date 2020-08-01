@@ -1,4 +1,4 @@
-export interface Event {
+export interface CalendarEvent {
   date: Date;
   name: string;
   // minutes
@@ -7,7 +7,7 @@ export interface Event {
 
 export interface DayState {
   date: Date;
-  events: Event[];
+  events: CalendarEvent[];
 }
 
 export type Calendar = Map<string, DayState>;

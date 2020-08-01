@@ -7,12 +7,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { Event } from "@/models/calendar.model";
+import { CalendarEvent } from "@/models/calendar.model";
 import { format } from "date-fns";
 
 @Component
 export default class EventBlock extends Vue {
-  @Prop() private event!: Event;
+  @Prop() private event!: CalendarEvent;
 
   formatEventHour(date: Date) {
     return format(date, "HH:mm");
@@ -29,7 +29,7 @@ export default class EventBlock extends Vue {
   margin-bottom: 16px;
   border-radius: 6px;
   padding: 5px 10px;
-  min-height: 40px;
+  min-height: 50px;
   > .duration {
     font-size: 0.8em;
   }

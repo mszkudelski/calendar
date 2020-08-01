@@ -12,14 +12,39 @@
     <div v-if="!dayState.events.length">
       No events yet!
     </div>
+    <form v-on:submit="createNewEvent($event)">
+      <input
+        v-model="newEvent.name"
+        class="input"
+        type="text"
+        name="event"
+        placeholder="Add new event..."
+      />
+      <select name="startDate" id="startDate" v-model="newEvent.startDate">
+        <option
+          v-for="hourSlot in hourSlots"
+          v-bind:value="hourSlot"
+          v-bind:key="hourSlot"
+          >{{ hourSlot }}</option
+        >
+      </select>
+      <select name="endDate" id="endDate" v-model="newEvent.endDate">
+        <option
+          v-for="hourSlot in hourSlots"
+          v-bind:value="hourSlot"
+          v-bind:key="hourSlot"
+          >{{ hourSlot }}</option
+        >
+      </select>
+    </form>
   </div>
 </template>
 
 <script lang="ts">
 import EventBlock from "@/components/EventBlock.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { DayState, Event } from "@/models/calendar.model";
-import { format } from "date-fns";
+import { DayState, CalendarEvent } from "@/models/calendar.model";
+import { add, format, roundToNearestMinutes } from "date-fns";
 
 @Component({
   components: {
@@ -33,6 +58,24 @@ export default class Day extends Vue {
     date: this.date,
     events: []
   };
+  private newEvent = {
+    name: "",
+    startDate: format(
+      roundToNearestMinutes(new Date(), { nearestTo: 30 }),
+      "HH:mm"
+    ),
+    endDate: format(
+      add(roundToNearestMinutes(new Date(), { nearestTo: 30 }), { hours: 1 }),
+      "HH:mm"
+    )
+  };
+  private hourSlots = new Array(24)
+    .fill(null)
+    .map((_, index) => {
+      const hour = index.toString().padStart(2, "0");
+      return [`${hour}:00`, `${hour}:30`];
+    })
+    .flat();
   constructor() {
     super();
     this.$watch("date", this.updateDayState);
@@ -47,9 +90,42 @@ export default class Day extends Vue {
     };
     this.dateFormatted = format(this.date, "dd.MM.yyyy");
   }
-  getSortedEvents(events: Event[]): Event[] {
+  getSortedEvents(events: CalendarEvent[]): CalendarEvent[] {
     return events.sort((a, b) =>
       a.date.getTime() > b.date.getTime() ? 1 : -1
+    );
+  }
+  createNewEvent(submitEvent: Event) {
+    submitEvent.preventDefault();
+
+    const [hours, minutes] = this.newEvent.startDate.split(":");
+
+    this.dayState.events.push({
+      name: this.newEvent.name,
+      date: new Date(
+        this.date.getFullYear(),
+        this.date.getMonth(),
+        this.date.getDate(),
+        +hours,
+        +minutes
+      ),
+      duration: this.calculateDuration(
+        this.newEvent.startDate,
+        this.newEvent.endDate
+      )
+    });
+    this.$store.commit("changeDay", this.dayState);
+  }
+
+  private calculateDuration(startDate: string, endDate: string): number {
+    const [startHours, startMinutes] = startDate.split(":");
+    const [endHours, endMinutes] = endDate.split(":");
+
+    return (
+      (new Date(0, 0, 0, +endHours, +endMinutes).getTime() -
+        new Date(0, 0, 0, +startHours, +startMinutes).getTime()) /
+      1000 /
+      60
     );
   }
 }
@@ -57,11 +133,18 @@ export default class Day extends Vue {
 
 <style scoped lang="scss">
 .day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 0 auto;
+  width: fit-content;
   > .event {
     width: fit-content;
   }
+}
+.input {
+  margin-top: 10px;
+  font-size: 1em;
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  border-bottom: 1px solid #aaa;
 }
 </style>
