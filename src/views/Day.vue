@@ -20,7 +20,9 @@ export default {
   },
   methods: {
     showPrevDay() {
-      this.date = subDays(this.date, 1);
+      console.log(this.date);
+      this.$set(this, "date", subDays(this.date, 1));
+      console.log(this.date);
     },
 
     showNextDay() {
