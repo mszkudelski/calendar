@@ -1,12 +1,37 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Day</router-link> |
-      <router-link to="/month">Month</router-link>
+      <router-link v-bind:to="'/' + date.toISOString()">Day</router-link> |
+      <router-link v-bind:to="'/month/' + date.toISOString()"
+        >Month</router-link
+      >
     </div>
     <router-view />
   </div>
 </template>
+
+<script>
+// @ is an alias to /src
+import { extractParamDate } from "@/helpers/extract-param-date";
+
+export default {
+  name: "App",
+  watch: {
+    $route(to) {
+      const date = extractParamDate(to);
+      this.$store.commit("changeCurrentDate", date);
+      this.$set(this, "date", date);
+    }
+  },
+  data() {
+    const date = extractParamDate(this.$route);
+    this.$store.commit("changeCurrentDate", date);
+    return {
+      date
+    };
+  }
+};
+</script>
 
 <style lang="scss">
 * {

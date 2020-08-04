@@ -15,6 +15,17 @@ const routes: Array<RouteConfig> = [
     name: "MonthView",
     component: () =>
       import(/* webpackChunkName: "month" */ "../views/Month.vue")
+  },
+  {
+    path: "/month/:date",
+    name: "MonthView",
+    component: () =>
+      import(/* webpackChunkName: "month" */ "../views/Month.vue")
+  },
+  {
+    path: "/:date",
+    name: "DayView",
+    component: DayView
   }
 ];
 

@@ -8,7 +8,14 @@
           v-for="(day, index) in month.slice((week - 1) * 7, week * 7)"
           v-bind:key="index"
         >
-          <DayBlock v-bind:day="day" />
+          <router-link
+            class="link"
+            v-bind:to="'/' + (day && day.date.toISOString())"
+            v-if="day"
+          >
+            <DayBlock v-bind:day="day" />
+          </router-link>
+          <DayBlock v-else />
         </div>
       </div>
     </div>
@@ -42,7 +49,7 @@ export default class Month extends Vue {
     const monthMap: Map<string, DayState> = this.$store.getters.getMonth(
       this.date
     );
-    this.month =
+    const month =
       new Array(getDaysInMonth(this.date)).fill(null).map((_, index) => {
         const date = setDate(this.date, index + 1);
         const key = format(date, "yyyy-MM-dd");
@@ -50,11 +57,13 @@ export default class Month extends Vue {
         return day || { date, events: [] };
       }) || [];
     this.month = [
-      ...new Array(this.month[0].date.getDay() - 1).fill(null),
-      ...this.month,
-      ...new Array(8 - this.month[this.month.length - 1].date.getDay()).fill(
-        null
-      )
+      ...(month[0].date.getDay()
+        ? new Array(month[0].date.getDay() - 1).fill(null)
+        : []),
+      ...month,
+      ...(month[month.length - 1].date.getDay()
+        ? new Array(8 - month[month.length - 1].date.getDay()).fill(null)
+        : [])
     ];
     this.dateFormatted = format(this.date, "MM.yyyy");
   }
@@ -78,5 +87,9 @@ main {
   &:last-of-type {
     border-bottom: #2c3e50 solid 1px;
   }
+}
+.link {
+  text-decoration: none;
+  color: initial;
 }
 </style>
