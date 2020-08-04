@@ -26,10 +26,6 @@ export default {
     Month
   },
   methods: {
-    // showPrevDay() {
-    //   this.$set(this, "date", sub(this.date, { months: 1 }));
-    //   this.$store.commit("changeCurrentDate", this.date);
-    // },
     setNewDate(date: Date) {
       this.$set(this, "date", date);
       this.$set(this, "prevDate", sub(date, { months: 1 }).toISOString());
