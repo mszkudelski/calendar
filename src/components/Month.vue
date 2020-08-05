@@ -2,7 +2,7 @@
   <main>
     <h1>Month</h1>
     <p>{{ dateFormatted }}</p>
-    <div class="grid">
+    <div class="grid" v-if="windowSize >= 740">
       <div class="row" v-for="week in getWeeksInMonth(date)" v-bind:key="week">
         <div
           v-for="(day, index) in month.slice((week - 1) * 7, week * 7)"
@@ -18,6 +18,12 @@
           <DayBlock v-else />
         </div>
       </div>
+    </div>
+    <div v-else>
+      <p>
+        Month view is not available on device with resolution lower than 740 px.
+      </p>
+      <p>Your current resolution: {{ windowSize }} px</p>
     </div>
   </main>
 </template>
@@ -38,12 +44,20 @@ export default class Month extends Vue {
   month: DayState[] = [];
   dateFormatted = "";
   getWeeksInMonth = getWeeksInMonth;
+  windowSize: number = window.innerWidth;
   constructor() {
     super();
     this.$watch("date", this.updateMonth);
   }
   mounted() {
     this.updateMonth();
+    window.addEventListener("resize", this.resizeHandler);
+  }
+  unmounted() {
+    window.removeEventListener("resize", this.resizeHandler);
+  }
+  resizeHandler() {
+    this.windowSize = window.innerWidth;
   }
   updateMonth() {
     const monthMap: Map<string, DayState> = this.$store.getters.getMonth(

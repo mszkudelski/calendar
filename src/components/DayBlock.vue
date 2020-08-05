@@ -24,6 +24,9 @@ export default class DayBlock extends Vue {
 .block {
   width: 150px;
   height: 100px;
+  @media (max-width: 1050px) {
+    width: 105px;
+  }
   border-right: #2c3e50 solid 1px;
   position: relative;
   display: flex;
