@@ -16,11 +16,12 @@
 
 <script lang="ts">
 // @ is an alias to /src
+import { Vue } from "vue-property-decorator";
 import Month from "@/components/Month.vue";
 import { add, sub } from "date-fns";
 import { extractParamDate } from "@/helpers/extract-param-date";
 
-export default {
+export default Vue.extend({
   name: "MonthView",
   components: {
     Month
@@ -48,5 +49,5 @@ export default {
       nextDate: add(date, { months: 1 }).toISOString()
     };
   }
-};
+});
 </script>

@@ -2,7 +2,6 @@
   <div class="day">
     <h1>Day</h1>
     <p>{{ dateFormatted }}</p>
-    <Weather v-bind:date="dayState.date" />
     <div
       v-for="event in getSortedEvents(dayState.events)"
       v-bind:key="event.name"
@@ -43,15 +42,13 @@
 
 <script lang="ts">
 import EventBlock from "@/components/EventBlock.vue";
-import Weather from "@/components/Weather.vue";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { DayState, CalendarEvent } from "@/models/calendar.model";
 import { add, format, roundToNearestMinutes } from "date-fns";
 
 @Component({
   components: {
-    EventBlock,
-    Weather
+    EventBlock
   }
 })
 export default class Day extends Vue {

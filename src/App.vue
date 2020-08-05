@@ -6,6 +6,9 @@
         >Month</router-link
       >
     </div>
+    <div class="weather">
+      <Weather />
+    </div>
     <router-view />
   </div>
 </template>
@@ -13,9 +16,13 @@
 <script>
 // @ is an alias to /src
 import { extractParamDate } from "@/helpers/extract-param-date";
+import Weather from "@/components/Weather.vue";
 
 export default {
   name: "App",
+  components: {
+    Weather
+  },
   watch: {
     $route(to) {
       const date = extractParamDate(to);
@@ -56,5 +63,10 @@ export default {
       color: #42b983;
     }
   }
+}
+
+.weather {
+  width: 100%;
+  margin: 20px 0;
 }
 </style>
