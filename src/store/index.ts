@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { CookiesService } from "@/helpers/cookie.service";
 import { Calendar, DayState } from "@/models/calendar.model";
-import { add, differenceInDays, format } from "date-fns";
+import { add, format } from "date-fns";
 
 Vue.use(Vuex);
 
@@ -16,26 +16,39 @@ function saveCalendarInCookie(calendar: Calendar) {
   });
 }
 
-function getWeatherData() {
-  return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(async position => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      const weatherData = await fetch(
-        `https://cors-anywhere.herokuapp.com/https://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly&lat=${latitude}&lon=${longitude}&appid=6f9d5e926cbb9d4cddbcfc0ba2e8a95b&units=metric`,
-        { headers: { "Content-Type": "application/json" } }
-      )
-        .then(response => response.json())
-        .catch(reject);
-      console.log(weatherData);
-      resolve(weatherData);
-    }, reject);
-  });
-}
-
 export interface AppState {
   calendar: Calendar;
   currentDate: Date;
+}
+
+function getCalendar(data: DayState[]) {
+  return data.reduce((result, day) => {
+    const date = new Date(day.date);
+    result.set(format(date, "yyyy-MM-dd"), {
+      date,
+      events: day.events.map(event => ({
+        ...event,
+        date: new Date(event.date)
+      }))
+    });
+    return result;
+  }, new Map<string, DayState>());
+}
+
+function getMockedCalendar() {
+  return [
+    {
+      date: new Date(),
+      events: [
+        {
+          date: add(new Date(), { hours: 2 }),
+          name: "Dinner with Kate",
+          duration: 45
+        },
+        { date: new Date(), name: "Meeting with Thomas", duration: 90 }
+      ]
+    }
+  ];
 }
 
 export default new Vuex.Store({
@@ -43,34 +56,12 @@ export default new Vuex.Store({
     const data: DayState[] = JSON.parse(cookieService.get(cookieName));
     let calendar: Calendar;
     if (data) {
-      calendar = data.reduce((result, day) => {
-        const date = new Date(day.date);
-        result.set(format(date, "yyyy-MM-dd"), {
-          date,
-          events: day.events.map(event => ({
-            ...event,
-            date: new Date(event.date)
-          }))
-        });
-        return result;
-      }, new Map<string, DayState>());
+      calendar = getCalendar(data);
     } else {
       // First user's app usage - cookie doesn't exist yet
       cookieService.set({
         name: cookieName,
-        value: JSON.stringify([
-          {
-            date: new Date(),
-            events: [
-              {
-                date: add(new Date(), { hours: 2 }),
-                name: "Dinner with Kate",
-                duration: 45
-              },
-              { date: new Date(), name: "Meeting with Thomas", duration: 90 }
-            ]
-          }
-        ])
+        value: JSON.stringify(getMockedCalendar())
       });
       calendar = new Map();
     }

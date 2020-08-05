@@ -63,14 +63,13 @@ export default class Month extends Vue {
     const monthMap: Map<string, DayState> = this.$store.getters.getMonth(
       this.date
     );
-    const month =
-      new Array(getDaysInMonth(this.date)).fill(null).map((_, index) => {
-        const date = setDate(this.date, index + 1);
-        const key = format(date, "yyyy-MM-dd");
-        const day = monthMap.get(key);
-        return day || { date, events: [] };
-      }) || [];
-    this.month = [
+    const month = this.getMonthDays(monthMap);
+    this.month = this.getMonthGridData(month);
+    this.dateFormatted = format(this.date, "MM.yyyy");
+  }
+
+  private getMonthGridData(month: DayState[]) {
+    return [
       ...(month[0].date.getDay()
         ? new Array(month[0].date.getDay() - 1).fill(null)
         : []),
@@ -79,7 +78,17 @@ export default class Month extends Vue {
         ? new Array(8 - month[month.length - 1].date.getDay()).fill(null)
         : [])
     ];
-    this.dateFormatted = format(this.date, "MM.yyyy");
+  }
+
+  private getMonthDays(monthMap: Map<string, DayState>) {
+    return (
+      new Array(getDaysInMonth(this.date)).fill(null).map((_, index) => {
+        const date = setDate(this.date, index + 1);
+        const key = format(date, "yyyy-MM-dd");
+        const day = monthMap.get(key);
+        return day || { date, events: [] };
+      }) || []
+    );
   }
 }
 </script>

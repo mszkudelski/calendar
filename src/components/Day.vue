@@ -58,17 +58,8 @@ export default class Day extends Vue {
     date: this.date,
     events: []
   };
-  private newEvent = {
-    name: "",
-    startDate: format(
-      roundToNearestMinutes(new Date(), { nearestTo: 30 }),
-      "HH:mm"
-    ),
-    endDate: format(
-      add(roundToNearestMinutes(new Date(), { nearestTo: 30 }), { hours: 1 }),
-      "HH:mm"
-    )
-  };
+  private newEvent = this.getNewEvent();
+
   private hourSlots = new Array(24)
     .fill(null)
     .map((_, index) => {
@@ -76,6 +67,7 @@ export default class Day extends Vue {
       return [`${hour}:00`, `${hour}:30`];
     })
     .flat();
+
   constructor() {
     super();
     this.$watch("date", this.updateDayState);
@@ -89,6 +81,20 @@ export default class Day extends Vue {
       events: []
     };
     this.dateFormatted = format(this.date, "dd.MM.yyyy");
+  }
+
+  private getNewEvent() {
+    return {
+      name: "",
+      startDate: format(
+        roundToNearestMinutes(new Date(), { nearestTo: 30 }),
+        "HH:mm"
+      ),
+      endDate: format(
+        add(roundToNearestMinutes(new Date(), { nearestTo: 30 }), { hours: 1 }),
+        "HH:mm"
+      )
+    };
   }
   getSortedEvents(events: CalendarEvent[]): CalendarEvent[] {
     return events.sort((a, b) =>
@@ -114,6 +120,7 @@ export default class Day extends Vue {
         this.newEvent.endDate
       )
     });
+    this.newEvent = this.getNewEvent();
     this.$store.commit("changeDay", this.dayState);
   }
 
