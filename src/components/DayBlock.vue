@@ -4,7 +4,7 @@
       {{ day.date.getDate() }}
     </div>
     <div class="events" v-bind:class="day.events.length || 'events--no-color'">
-      {{ day.events.length || "brak" }} wydarzeń
+      {{ day.events.length || "no" }} events
     </div>
   </div>
   <div class="block" v-else></div>
